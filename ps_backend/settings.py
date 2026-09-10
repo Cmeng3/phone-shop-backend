@@ -28,6 +28,9 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DJANGO_DEBUG', default=config('DEBUG', default='False'), cast=lambda value: str(value).lower() in ('true', '1', 'yes', 'on'))
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=lambda v: [h.strip() for h in v.split(',') if h.strip()])
+RENDER_EXTERNAL_HOSTNAME = config('RENDER_EXTERNAL_HOSTNAME', default='').strip()
+if RENDER_EXTERNAL_HOSTNAME and RENDER_EXTERNAL_HOSTNAME not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 
 # Application definition
