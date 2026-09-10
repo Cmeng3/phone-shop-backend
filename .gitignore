@@ -45,3 +45,6 @@ frontend/playwright-report/
 !.env.example
 *.pem
 *.key
+
+# Private database migration backups
+.migration-backups/
