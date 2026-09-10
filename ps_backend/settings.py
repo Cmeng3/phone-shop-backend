@@ -54,6 +54,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'common.rate_limits.APIRateLimitMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -132,6 +133,17 @@ USE_I18N = True
 
 USE_TZ = True
 
+RATE_LIMIT_REDIS_URL = config('RATE_LIMIT_REDIS_URL', default='')
+RATE_LIMIT_TRUST_RENDER_PROXY = config('RATE_LIMIT_TRUST_RENDER_PROXY', default=bool(RENDER_EXTERNAL_HOSTNAME), cast=bool)
+RATE_LIMIT_LOGIN_PER_MINUTE = config('RATE_LIMIT_LOGIN_PER_MINUTE', default=5, cast=int)
+RATE_LIMIT_ANON_PER_MINUTE = config('RATE_LIMIT_ANON_PER_MINUTE', default=30, cast=int)
+RATE_LIMIT_USER_PER_MINUTE = config('RATE_LIMIT_USER_PER_MINUTE', default=120, cast=int)
+RATE_LIMIT_IP_PER_MINUTE = config('RATE_LIMIT_IP_PER_MINUTE', default=120, cast=int)
+RATE_LIMIT_UPLOAD_PER_MINUTE = config('RATE_LIMIT_UPLOAD_PER_MINUTE', default=10, cast=int)
+if min(RATE_LIMIT_LOGIN_PER_MINUTE, RATE_LIMIT_ANON_PER_MINUTE, RATE_LIMIT_USER_PER_MINUTE,
+       RATE_LIMIT_IP_PER_MINUTE, RATE_LIMIT_UPLOAD_PER_MINUTE) < 1:
+    raise ImproperlyConfigured('Rate limits must be positive integers.')
+
 REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'common.exceptions.api_exception_handler',
     'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework.authentication.TokenAuthentication'],
@@ -139,7 +151,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAuthenticated'],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 50,
-    'DEFAULT_THROTTLE_RATES': {'login': '10/min'},
+    'DEFAULT_THROTTLE_CLASSES': ['common.rate_limits.UserAndUploadThrottle'],
     'DATETIME_FORMAT': '%Y-%m-%d %H:%M:%S',
 }
 

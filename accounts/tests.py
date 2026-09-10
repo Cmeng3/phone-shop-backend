@@ -253,7 +253,7 @@ class WorkflowTests(APITestCase):
             self.assertEqual(self.client.delete('/api/v1/' + path).status_code, 204)
 
     def test_login_throttle(self):
-        for _ in range(10):
+        for _ in range(5):
             self.assertEqual(self.post('auth/login', {'identifier': 'missing@example.com', 'password': 'wrong'}).status_code, 401)
         self.assertEqual(self.post('auth/login', {'identifier': 'missing@example.com', 'password': 'wrong'}).status_code, 429)
 

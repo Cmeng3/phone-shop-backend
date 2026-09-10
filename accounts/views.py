@@ -8,7 +8,6 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import AuthenticationFailed, PermissionDenied, ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 from accounts.models import Profile, Role, RoleRequest
 from accounts.serializers import ProfileSerializer, UserCreateSerializer, RoleSerializer, RoleRequestSerializer, check_password_strength
@@ -22,8 +21,6 @@ User = get_user_model()
 class LoginView(APIView):
     permission_classes = [AllowAny]
     authentication_classes = []
-    throttle_classes = [ScopedRateThrottle]
-    throttle_scope = 'login'
 
     def get_authenticate_header(self, request):
         return 'Token'
